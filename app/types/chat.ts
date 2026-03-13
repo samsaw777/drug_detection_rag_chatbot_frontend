@@ -1,0 +1,55 @@
+// ---- Response Types (from backend) ---- //
+
+export type NormalResponse = {
+  interaction_types: string[];
+  drugs: string[];
+  foods: string[];
+  herbs: string[];
+  corrected_query: string;
+};
+
+export type ClarificationCorrection = {
+  original: string;
+  corrected: string;
+  type: string;
+};
+
+export type ClarificationResponse = {
+  corrections: ClarificationCorrection[];
+  message: string;
+  needs_clarification: true;
+  thread_id: string;
+};
+
+// ---- Chat Message Types ---- //
+
+export type UserMessage = {
+  role: "user";
+  content: string;
+};
+
+export type BotNormalMessage = {
+  role: "bot";
+  type: "normal";
+  data: NormalResponse;
+};
+
+export type BotClarificationMessage = {
+  role: "bot";
+  type: "clarification";
+  message: string;
+  threadId: string;
+  corrections: ClarificationCorrection[];
+};
+
+export type BotErrorMessage = {
+  role: "bot";
+  type: "error";
+  content: string;
+};
+
+export type ChatMessage =
+  | UserMessage
+  | BotNormalMessage
+  | BotClarificationMessage
+  | BotErrorMessage;
