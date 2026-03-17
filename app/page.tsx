@@ -7,7 +7,6 @@ import type {
   NormalResponse,
   ClarificationResponse,
 } from "./types/chat";
-import { log } from "console";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
 
