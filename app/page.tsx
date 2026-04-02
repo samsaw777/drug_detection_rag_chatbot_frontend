@@ -37,6 +37,7 @@ export default function Home() {
         });
 
         const data = await res.json();
+        console.log("full response:", data);
 
         if (!res.ok) {
             setMessages((prev) => [
@@ -50,35 +51,58 @@ export default function Home() {
             return;
         }
 
-        // Backend says it needs clarification
-        if (data.needs_clarification) {
-            const clarification = data as ClarificationResponse;
-            setMessages((prev) => [
-            ...prev,
-            {
-                role: "bot",
-                type: "clarification",
-                message: clarification.message,
-                threadId: clarification.thread_id,
-                corrections: clarification.corrections,
-            },
-            ]);
-            return;
-        }
+        // ---- Backend says it needs clarification ---- //
+        if (data.type === "clarification" || data.type === "both" || data.type === "spelling") {
+			const clarification = data as ClarificationResponse;
 
-        // Backend says it needs missing value
-        if (data.needs_missing) {
-            setMessages((prev) => [
-            ...prev,
-            {
-                role: "bot",
-                type: "missing",
-                message: "Please provide the missing drug/food/herb name.",
-                threadId: "test-thread-123",
-            },
-            ]);
-            return;
-        }
+			// Only missing value — show red textbox only
+			if (clarification.type === "clarification") {
+				setMessages((prev) => [
+					...prev,
+					{
+						role: "bot",
+						type: "missing",
+						message: clarification.message,
+						threadId: clarification.thread_id,
+					},
+				]);
+				return;
+			}
+			// Only spelling — show amber yes button + textbox
+			if (clarification.type === "spelling") {
+				setMessages((prev) => [
+					...prev,
+					{
+						role: "bot",
+						type: "clarification",
+						message: clarification.message,
+						threadId: clarification.thread_id,
+						corrections: clarification.corrections,
+					},
+				]);
+				return;
+			}
+			// Both spelling + missing — show both bubbles
+			if (clarification.type === "both") {
+				setMessages((prev) => [
+					...prev,
+					{
+						role: "bot",
+						type: "clarification",
+						message: clarification.message,
+						threadId: clarification.thread_id,
+						corrections: clarification.corrections,
+					},
+					{
+						role: "bot",
+						type: "missing",
+						message: "Please also provide the missing value.",
+						threadId: clarification.thread_id,
+					},
+				]);
+				return;
+			}
+      }
 
         // Normal parsed response
         const normal = data as NormalResponse;
