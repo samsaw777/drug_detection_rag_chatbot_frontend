@@ -42,6 +42,13 @@ export type BotClarificationMessage = {
   corrections: ClarificationCorrection[];
 };
 
+export type BotMissingMessage = {
+  role: "bot";
+  type: "missing";
+  message: string;
+  threadId: string;
+};
+
 export type BotErrorMessage = {
   role: "bot";
   type: "error";
@@ -52,4 +59,5 @@ export type ChatMessage =
   | UserMessage
   | BotNormalMessage
   | BotClarificationMessage
-  | BotErrorMessage;
+  | BotErrorMessage
+  | BotMissingMessage;
