@@ -15,6 +15,8 @@ export default function Home() {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [pendingThreadId, setPendingThreadId] = useState<string | null>(null);
+    const [pendingSpellingReply, setPendingSpellingReply] = useState<string | null>(null);
 
     useEffect(() => {
         setMounted(true);
@@ -84,24 +86,19 @@ export default function Home() {
 			}
 			// Both spelling + missing — show both bubbles
 			if (clarification.type === "both") {
-				setMessages((prev) => [
-					...prev,
-					{
-						role: "bot",
-						type: "clarification",
-						message: clarification.message,
-						threadId: clarification.thread_id,
-						corrections: clarification.corrections,
-					},
-					{
-						role: "bot",
-						type: "missing",
-						message: "Please also provide the missing value.",
-						threadId: clarification.thread_id,
-					},
-				]);
-				return;
-			}
+                setPendingThreadId(clarification.thread_id);
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        role: "bot",
+                        type: "clarification",
+                        message: clarification.message,
+                        threadId: clarification.thread_id,
+                        corrections: clarification.corrections,
+                    },
+                ]);
+                return;
+            }
       }
 
         // Normal parsed response
@@ -129,52 +126,42 @@ export default function Home() {
         threadId: string,
         userInput: string,
     ) => {
-        // Show user's clarification reply in chat
         setMessages((prev) => [...prev, { role: "user", content: userInput }]);
-        setLoading(true);
 
-        try {
-        const res = await fetch(`${API_BASE}/analyse/confirm`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-            thread_id: threadId,
-            user_reply: userInput,
-            }),
-        });
-
-        const data = await res.json();
-        console.log(data);
-
-        if (!res.ok) {
+        // If this is part of a "both" flow, store spelling reply and show missing bubble
+        if (pendingThreadId === threadId) {
+            setPendingSpellingReply(userInput);
             setMessages((prev) => [
-            ...prev,
-            {
-                role: "bot",
-                type: "error",
-                content: `❌ Error: ${data.detail || "Something went wrong."}`,
-            },
+                ...prev,
+                {
+                    role: "bot",
+                    type: "missing",
+                    message: "Please also provide the missing value.",
+                    threadId: threadId,
+                },
             ]);
             return;
         }
 
-        // After clarification, backend should return a normal response
-        const normal = data as NormalResponse;
-        setMessages((prev) => [
-            ...prev,
-            { role: "bot", type: "normal", data: normal },
-        ]);
+        // Normal spelling only flow
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_BASE}/analyse/confirm`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ thread_id: threadId, user_reply: userInput }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                setMessages((prev) => [...prev, { role: "bot", type: "error", content: `❌ Error: ${data.detail || "Something went wrong."}` }]);
+                return;
+            }
+            const normal = data as NormalResponse;
+            setMessages((prev) => [...prev, { role: "bot", type: "normal", data: normal }]);
         } catch {
-        setMessages((prev) => [
-            ...prev,
-            {
-            role: "bot",
-            type: "error",
-            content: "❌ Error connecting to server. Is the backend running?",
-            },
-        ]);
+            setMessages((prev) => [...prev, { role: "bot", type: "error", content: "❌ Error connecting to server. Is the backend running?" }]);
         } finally {
-        setLoading(false);
+            setLoading(false);
         }
     };
 
@@ -184,52 +171,35 @@ export default function Home() {
         threadId: string,
         userInput: string,
     ) => {
-        // Show user's clarification reply in chat
         setMessages((prev) => [...prev, { role: "user", content: userInput }]);
         setLoading(true);
 
+        // Combine spelling + missing answers if this is a "both" flow
+        const combinedReply = pendingSpellingReply
+            ? `${pendingSpellingReply}, ${userInput}`
+            : userInput;
+
+        // Clear pending state
+        setPendingThreadId(null);
+        setPendingSpellingReply(null);
+
         try {
-        const res = await fetch(`${API_BASE}/analyse/confirm`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-            thread_id: threadId,
-            user_reply: userInput,
-            }),
-        });
-
-        const data = await res.json();
-        console.log(data);
-
-        if (!res.ok) {
-            setMessages((prev) => [
-            ...prev,
-            {
-                role: "bot",
-                type: "error",
-                content: `❌ Error: ${data.detail || "Something went wrong."}`,
-            },
-            ]);
-            return;
-        }
-
-        // After Missing value entered, backend should return a normal response
-        const normal = data as NormalResponse;
-        setMessages((prev) => [
-            ...prev,
-            { role: "bot", type: "normal", data: normal },
-        ]);
+            const res = await fetch(`${API_BASE}/analyse/confirm`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ thread_id: threadId, user_reply: combinedReply }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                setMessages((prev) => [...prev, { role: "bot", type: "error", content: `❌ Error: ${data.detail || "Something went wrong."}` }]);
+                return;
+            }
+            const normal = data as NormalResponse;
+            setMessages((prev) => [...prev, { role: "bot", type: "normal", data: normal }]);
         } catch {
-        setMessages((prev) => [
-            ...prev,
-            {
-            role: "bot",
-            type: "error",
-            content: "❌ Error connecting to server. Is the backend running?",
-            },
-        ]);
+            setMessages((prev) => [...prev, { role: "bot", type: "error", content: "❌ Error connecting to server. Is the backend running?" }]);
         } finally {
-        setLoading(false);
+            setLoading(false);
         }
     };
 
