@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import type { ChatMessage } from "../types/chat";
 
 type MessageBubbleProps = {
@@ -14,62 +15,76 @@ export default function MessageBubble({
   onClarificationSubmit,
   onMissingSubmit,
 }: MessageBubbleProps) {
-  // ---- User Message ---- //
-  if (message.role === "user") {
-    return (
-      <div className="flex justify-end">
-        <div className="max-w-xl px-4 py-3 rounded-2xl rounded-br-none bg-blue-600 text-white text-sm">
-          {message.content}
-        </div>
-      </div>
-    );
-  }
+	// ---- User Message ---- //
+	if (message.role === "user") {
+		return (
+			<div className="flex justify-end">
+				<div className="max-w-xl px-4 py-3 rounded-2xl rounded-br-none bg-blue-600 text-white text-sm">
+				{message.content}
+				</div>
+			</div>
+		);
+	}
 
-  // ---- Bot: Error ---- //
-  if (message.type === "error") {
-    return (
-      <div className="flex justify-start">
-        <div className="max-w-xl px-4 py-3 rounded-2xl rounded-bl-none bg-white text-gray-800 border shadow-sm text-sm">
-          {message.content}
-        </div>
-      </div>
-    );
-  }
+	// ---- Bot: Error ---- //
+	if (message.type === "error") {
+		return (
+			<div className="flex justify-start">
+				<div className="max-w-xl px-4 py-3 rounded-2xl rounded-bl-none bg-white text-gray-800 border shadow-sm text-sm">
+				{message.content}
+				</div>
+			</div>
+		);
+	}
 
-  // ---- Bot: Normal Response ---- //
-  if (message.type === "normal") {
-    const { data } = message;
-    return (
-      <div className="flex justify-start">
-        <div className="max-w-xl px-4 py-3 rounded-2xl rounded-bl-none bg-white text-gray-800 border shadow-sm text-sm whitespace-pre-wrap">
-          {data.final_output}
-        </div>
-      </div>
-    );
-  }
+	// ---- Bot: Normal Response ---- //
+	if (message.type === "normal") {
+		const { data } = message;
+		return (
+			<div className="flex justify-start">
+			<div className="max-w-xl px-4 py-3 rounded-2xl rounded-bl-none bg-white text-gray-800 border shadow-sm text-sm">
+				<ReactMarkdown
+				components={{
+					h1: ({ children }) => <h1 className="text-base font-semibold mt-3 mb-1">{children}</h1>,
+					h2: ({ children }) => <h2 className="text-sm font-semibold mt-3 mb-1">{children}</h2>,
+					h3: ({ children }) => <h3 className="text-sm font-semibold mt-2 mb-1">{children}</h3>,
+					strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+					p: ({ children }) => <p className="mb-2 leading-relaxed">{children}</p>,
+					ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+					ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+					li: ({ children }) => <li className="text-gray-700">{children}</li>,
+				}}
+				>
+				{data.final_output}
+				</ReactMarkdown>
+			</div>
+			</div>
+		);
+	}
+    
 
-  // ---- Bot: Clarification ---- //
-  if (message.type === "clarification") {
-    return (
-      <ClarificationBubble
-        message={message.message}
-        threadId={message.threadId}
-        onSubmit={onClarificationSubmit}
-      />
-    );
-  }
+	// ---- Bot: Clarification ---- //
+	if (message.type === "clarification") {
+		return (
+		<ClarificationBubble
+			message={message.message}
+			threadId={message.threadId}
+			onSubmit={onClarificationSubmit}
+		/>
+		);
+	}
 
-  // ---- Bot: Handling Missing Value ---- //
-  if (message.type === "missing") {
-    return (
-      <MissingBubble
-        message={message.message}
-        threadId={message.threadId}
-        onSubmit={onMissingSubmit}
-      />
-    );
-  }
-  return null;
+	// ---- Bot: Handling Missing Value ---- //
+	if (message.type === "missing") {
+		return (
+		<MissingBubble
+			message={message.message}
+			threadId={message.threadId}
+			onSubmit={onMissingSubmit}
+		/>
+		);
+	}
+	return null;
 }
 
 // ---- Clarification Sub-component (keeps state local) ---- //

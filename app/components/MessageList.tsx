@@ -40,6 +40,7 @@ export default function MessageList({
 }
 
 
+// Loader
 const LOADING_MESSAGES = [
 	"Analysing query...",
 	"Checking interaction database...",
@@ -50,17 +51,44 @@ function LoadingBubble() {
 	const [index, setIndex] = useState(0);
 
 	useEffect(() => {
-		const interval = setInterval(() => {
-		setIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
-		}, 1500);
-		return () => clearInterval(interval);
-	}, []);
+		if (index === LOADING_MESSAGES.length) return; // ← stop at last step
+		const timeout = setTimeout(() => {
+			setIndex((prev) => prev + 1);
+		}, 3500);
+		return () => clearTimeout(timeout);
+		}, [index]);
 
 	return (
 		<div className="flex justify-start">
-		<div className="bg-white border rounded-2xl rounded-bl-none px-4 py-3 text-sm text-gray-400 shadow-sm flex items-center gap-2">
-			<span className="animate-pulse">●</span>
-			{LOADING_MESSAGES[index]}
+		<div className="bg-white border rounded-2xl rounded-bl-none px-4 py-3 text-sm shadow-sm space-y-2">
+			{LOADING_MESSAGES.map((msg, i) => (
+			<div key={i} className="flex items-center gap-2">
+				{/* Icon */}
+				{i < index ? (
+				// Done — green check
+				<span className="text-green-500 text-xs">✓</span>
+				) : i === index ? (
+				// Active — blue pulse
+				<span className="text-blue-500 animate-pulse text-xs">●</span>
+				) : (
+				// Pending — gray dot
+				<span className="text-gray-300 text-xs">●</span>
+				)}
+
+				{/* Text */}
+				<span
+				className={
+					i < index
+					? "text-green-500"
+					: i === index
+					? "text-blue-500 font-medium"
+					: "text-gray-300"
+				}
+				>
+				{msg}
+				</span>
+			</div>
+			))}
 		</div>
 		</div>
 	);
