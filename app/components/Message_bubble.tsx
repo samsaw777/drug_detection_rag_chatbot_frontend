@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import type { ChatMessage } from "../types/chat";
 
 type MessageBubbleProps = {
@@ -41,9 +42,22 @@ export default function MessageBubble({
 		const { data } = message;
 		return (
 			<div className="flex justify-start">
-				<div className="max-w-xl px-4 py-3 rounded-2xl rounded-bl-none bg-white text-gray-800 border shadow-sm text-sm whitespace-pre-wrap">
+			<div className="max-w-xl px-4 py-3 rounded-2xl rounded-bl-none bg-white text-gray-800 border shadow-sm text-sm">
+				<ReactMarkdown
+				components={{
+					h1: ({ children }) => <h1 className="text-base font-semibold mt-3 mb-1">{children}</h1>,
+					h2: ({ children }) => <h2 className="text-sm font-semibold mt-3 mb-1">{children}</h2>,
+					h3: ({ children }) => <h3 className="text-sm font-semibold mt-2 mb-1">{children}</h3>,
+					strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+					p: ({ children }) => <p className="mb-2 leading-relaxed">{children}</p>,
+					ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+					ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+					li: ({ children }) => <li className="text-gray-700">{children}</li>,
+				}}
+				>
 				{data.final_output}
-				</div>
+				</ReactMarkdown>
+			</div>
 			</div>
 		);
 	}
