@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import type { ChatMessage } from "../types/chat";
+import { UserAvatar, BotAvatar } from "./MessageList";
 
 type MessageBubbleProps = {
   message: ChatMessage;
@@ -15,80 +16,144 @@ export default function MessageBubble({
   onClarificationSubmit,
   onMissingSubmit,
 }: MessageBubbleProps) {
-	// ---- User Message ---- //
-	if (message.role === "user") {
-		return (
-			<div className="flex justify-end">
-				<div className="max-w-xl px-4 py-3 rounded-2xl rounded-br-none bg-blue-600 text-white text-sm">
-				{message.content}
-				</div>
-			</div>
-		);
-	}
+  // ---- User Message ---- //
+  if (message.role === "user") {
+    return (
+      <div className="flex items-start gap-2.5 justify-end msg-appear">
+        <div className="flex flex-col items-end gap-1 max-w-[75%]">
+          <span className="text-xs font-semibold text-indigo-400 tracking-wide">
+            You
+          </span>
+          <div
+            className="px-4 py-3 rounded-2xl rounded-tr-md text-white text-sm shadow-sm"
+            style={{ background: "linear-gradient(135deg, #4f46e5, #6366f1)" }}
+          >
+            {message.content}
+          </div>
+        </div>
+        <UserAvatar />
+      </div>
+    );
+  }
 
-	// ---- Bot: Error ---- //
-	if (message.type === "error") {
-		return (
-			<div className="flex justify-start">
-				<div className="max-w-xl px-4 py-3 rounded-2xl rounded-bl-none bg-white text-gray-800 border shadow-sm text-sm">
-				{message.content}
-				</div>
-			</div>
-		);
-	}
+  // ---- Bot: Error ---- //
+  if (message.type === "error") {
+    return (
+      <div className="flex items-start gap-2.5 msg-appear">
+        <BotAvatar />
+        <div className="flex flex-col gap-1 max-w-[75%]">
+          <span className="text-xs font-semibold text-teal-700 tracking-wide">
+            Dr. Agent
+          </span>
+          <div className="px-4 py-3 rounded-2xl rounded-tl-md bg-red-50 text-slate-700 text-sm shadow-sm border border-red-200">
+            {message.content}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-	// ---- Bot: Normal Response ---- //
-	if (message.type === "normal") {
-		const { data } = message;
-		return (
-			<div className="flex justify-start">
-			<div className="max-w-xl px-4 py-3 rounded-2xl rounded-bl-none bg-white text-gray-800 border shadow-sm text-sm">
-				<ReactMarkdown
-				components={{
-					h1: ({ children }) => <h1 className="text-base font-semibold mt-3 mb-1">{children}</h1>,
-					h2: ({ children }) => <h2 className="text-sm font-semibold mt-3 mb-1">{children}</h2>,
-					h3: ({ children }) => <h3 className="text-sm font-semibold mt-2 mb-1">{children}</h3>,
-					strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
-					p: ({ children }) => <p className="mb-2 leading-relaxed">{children}</p>,
-					ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-					ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
-					li: ({ children }) => <li className="text-gray-700">{children}</li>,
-				}}
-				>
-				{data.final_output}
-				</ReactMarkdown>
-			</div>
-			</div>
-		);
-	}
-    
+  // ---- Bot: Normal Response ---- //
+  if (message.type === "normal") {
+    const { data } = message;
+    return (
+      <div className="flex items-start gap-2.5 msg-appear">
+        <BotAvatar />
+        <div className="flex flex-col gap-1 max-w-[75%]">
+          <span className="text-xs font-semibold text-teal-700 tracking-wide">
+            Dr. Agent
+          </span>
+          <div className="px-4 py-3 rounded-2xl rounded-tl-md bg-white text-slate-700 text-sm shadow-sm border border-slate-100">
+            <ReactMarkdown
+              components={{
+                h1: ({ children }) => (
+                  <h1 className="text-base font-semibold mt-3 mb-1">
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="text-sm font-semibold mt-3 mb-1">
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-sm font-semibold mt-2 mb-1">
+                    {children}
+                  </h3>
+                ),
+                strong: ({ children }) => (
+                  <strong className="font-semibold text-slate-900">
+                    {children}
+                  </strong>
+                ),
+                p: ({ children }) => (
+                  <p className="mb-2 leading-relaxed">{children}</p>
+                ),
+                ul: ({ children }) => (
+                  <ul className="list-disc list-inside mb-2 space-y-1">
+                    {children}
+                  </ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="list-decimal list-inside mb-2 space-y-1">
+                    {children}
+                  </ol>
+                ),
+                li: ({ children }) => (
+                  <li className="text-slate-700">{children}</li>
+                ),
+              }}
+            >
+              {data.final_output}
+            </ReactMarkdown>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-	// ---- Bot: Clarification ---- //
-	if (message.type === "clarification") {
-		return (
-		<ClarificationBubble
-			message={message.message}
-			threadId={message.threadId}
-			onSubmit={onClarificationSubmit}
-		/>
-		);
-	}
+  // ---- Bot: Clarification ---- //
+  if (message.type === "clarification") {
+    return (
+      <div className="flex items-start gap-2.5 msg-appear">
+        <BotAvatar />
+        <div className="flex flex-col gap-1 max-w-[75%]">
+          <span className="text-xs font-semibold text-teal-700 tracking-wide">
+            Dr. Agent
+          </span>
+          <ClarificationBubble
+            message={message.message}
+            threadId={message.threadId}
+            onSubmit={onClarificationSubmit}
+          />
+        </div>
+      </div>
+    );
+  }
 
-	// ---- Bot: Handling Missing Value ---- //
-	if (message.type === "missing") {
-		return (
-		<MissingBubble
-			message={message.message}
-			threadId={message.threadId}
-			onSubmit={onMissingSubmit}
-		/>
-		);
-	}
-	return null;
+  // ---- Bot: Missing Value ---- //
+  if (message.type === "missing") {
+    return (
+      <div className="flex items-start gap-2.5 msg-appear">
+        <BotAvatar />
+        <div className="flex flex-col gap-1 max-w-[75%]">
+          <span className="text-xs font-semibold text-teal-700 tracking-wide">
+            Dr. Agent
+          </span>
+          <MissingBubble
+            message={message.message}
+            threadId={message.threadId}
+            onSubmit={onMissingSubmit}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 }
 
-// ---- Clarification Sub-component (keeps state local) ---- //
-
+// ---- Clarification Sub-component ---- //
 type ClarificationBubbleProps = {
   message: string;
   threadId: string;
@@ -117,49 +182,45 @@ function ClarificationBubble({
   };
 
   return (
-    <div className="flex justify-start">
-      <div className="max-w-xl px-4 py-3 rounded-2xl rounded-bl-none bg-amber-50 text-gray-800 border border-amber-200 shadow-sm text-sm">
-        {/* Clarification message from backend */}
-        <p className="mb-3">{message}</p>
+    <div className="px-4 py-3 rounded-2xl rounded-tl-md bg-amber-50 text-slate-700 border border-amber-200 shadow-sm text-sm">
+      <p className="mb-3">{message}</p>
 
-        {!submitted ? (
-          <div className="space-y-2">
-            {/* Yes / Confirm button */}
-            <button
-              onClick={handleConfirm}
-              className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-            >
-              Yes, that&apos;s correct
-            </button>
+      {!submitted ? (
+        <div className="space-y-2">
+          <button
+            onClick={handleConfirm}
+            className="w-full text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors hover:opacity-90"
+            style={{ background: "linear-gradient(135deg, #4f46e5, #6366f1)" }}
+          >
+            Yes, that&apos;s correct
+          </button>
 
-            {/* Custom correction input */}
-            <input
-              type="text"
-              value={correctionInput}
-              onChange={(e) => setCorrectionInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleCustomSubmit()}
-              placeholder="Or type the correct name(s)..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-            />
+          <input
+            type="text"
+            value={correctionInput}
+            onChange={(e) => setCorrectionInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleCustomSubmit()}
+            placeholder="Or type the correct name(s)..."
+            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 bg-white"
+          />
 
-            {/* Submit custom correction */}
-            <button
-              onClick={handleCustomSubmit}
-              disabled={!correctionInput.trim()}
-              className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Submit Correction
-            </button>
-          </div>
-        ) : (
-          <p className="text-xs text-gray-500 italic">Response submitted ✓</p>
-        )}
-      </div>
+          <button
+            onClick={handleCustomSubmit}
+            disabled={!correctionInput.trim()}
+            className="w-full px-4 py-2 rounded-xl text-sm font-medium text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ background: "linear-gradient(135deg, #0d9488, #14b8a6)" }}
+          >
+            Submit Correction
+          </button>
+        </div>
+      ) : (
+        <p className="text-xs text-slate-500 italic">Response submitted ✓</p>
+      )}
     </div>
   );
 }
 
-// ---- Missing Value Sub-component (keeps state local) ---- //
+// ---- Missing Value Sub-component ---- //
 type MissingBubbleProps = {
   message: string;
   threadId: string;
@@ -177,32 +238,31 @@ function MissingBubble({ message, threadId, onSubmit }: MissingBubbleProps) {
   };
 
   return (
-    <div className="flex justify-start">
-      <div className="max-w-xl px-4 py-3 rounded-2xl rounded-bl-none bg-red-50 text-gray-800 border border-red-200 shadow-sm text-sm">
-        <p className="mb-3">{message}</p>
+    <div className="px-4 py-3 rounded-2xl rounded-tl-md bg-red-50 text-slate-700 border border-red-200 shadow-sm text-sm">
+      <p className="mb-3">{message}</p>
 
-        {!submitted ? (
-          <div className="space-y-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              placeholder="Enter the missing value..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-            />
-            <button
-              onClick={handleSubmit}
-              disabled={!input.trim()}
-              className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Submit
-            </button>
-          </div>
-        ) : (
-          <p className="text-xs text-gray-500 italic">Response submitted ✓</p>
-        )}
-      </div>
+      {!submitted ? (
+        <div className="space-y-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            placeholder="Enter the missing value..."
+            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 bg-white"
+          />
+          <button
+            onClick={handleSubmit}
+            disabled={!input.trim()}
+            className="w-full px-4 py-2 rounded-xl text-sm font-medium text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ background: "linear-gradient(135deg, #0d9488, #14b8a6)" }}
+          >
+            Submit
+          </button>
+        </div>
+      ) : (
+        <p className="text-xs text-slate-500 italic">Response submitted ✓</p>
+      )}
     </div>
   );
 }
