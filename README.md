@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) front-end for the RAG chatbot. 
+# APDP Frontend — Agentic Pharmacological Data Platform
+
+A Next.js chat interface for querying drug-food, drug-herb, and drug-drug interactions. Users ask natural language questions and receive clinically formatted responses powered by the APDP backend pipeline.
+
+## Features
+
+- **Chat Interface** — conversational UI for drug interaction queries with message history
+- **Spelling Correction Flow** — interactive UI for confirming or correcting misspelled drug/food/herb names
+- **Clarification Flow** — prompts users for missing information when queries are incomplete, supports repeated clarifications
+- **Markdown Rendering** — formatted responses with headers, lists, and emphasis via React Markdown
+- **Responsive Design** — works on desktop and mobile with auto-resizing input
+
+## Tech Stack
+
+- **Framework:** Next.js 14+ (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Markdown:** react-markdown
+- **Deployment:** Vercel
+
+## Project Structure
+
+```
+├── app/
+│   ├── components/
+│   │   ├── Message_bubble.tsx   # Message rendering (normal, clarification, spelling, error)
+│   │   ├── MessageList.tsx      # Scrollable message list with loading indicator
+│   │   └── Navbar.tsx           # Top navigation bar
+│   ├── types/
+│   │   └── chat.ts             # TypeScript types for messages and API responses
+│   ├── about/
+│   │   └── page.tsx            # About page
+│   ├── page.tsx                # Main chat page (state management, API calls)
+│   ├── layout.tsx              # Root layout
+│   ├── globals.css             # Global styles
+│   └── favicon.ico
+├── public/                     # Static assets
+├── next.config.ts
+├── tailwind.config.ts
+├── tsconfig.json
+├── package.json
+└── eslint.config.mjs
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js 18+
+- APDP backend running (locally or deployed)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Clone the repository**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   git clone https://github.com/samsaw777/apdp-project-frontend.git
+   cd apdp-project-frontend
+   ```
 
-## Learn More
+2. **Install dependencies**
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Create environment file**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   cp .env.example .env
+   ```
 
-## Deploy on Vercel
+   Set the backend URL:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   ```
+   NEXT_PUBLIC_API_BASE=http://localhost:8000/api/v1
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+   The app will be available at `http://localhost:3000`.
+
+## Environment Variables
+
+| Variable               | Required | Description                                                 |
+| ---------------------- | -------- | ----------------------------------------------------------- |
+| `NEXT_PUBLIC_API_BASE` | Yes      | Backend API base URL (e.g., `http://localhost:8000/api/v1`) |
+
+## How It Works
+
+The frontend communicates with two backend endpoints:
+
+1. **`POST /analyse`** — sends the user's query. The response is either a final answer (rendered as markdown), a spelling correction prompt (rendered with confirm/correct UI), or a clarification request (rendered with an input field).
+
+2. **`POST /analyse/confirm`** — sends the user's reply to a spelling or clarification prompt. The response can be a final answer or another clarification if more information is still needed.
+
+All response handling is unified through a single `handleBotResponse` function that checks the response type and renders the appropriate UI component.
+
+## Message Types
+
+| Type            | Description                       | UI Component                      |
+| --------------- | --------------------------------- | --------------------------------- |
+| `normal`        | Final formatted answer            | Markdown bubble                   |
+| `clarification` | Spelling correction needed        | Confirm button + correction input |
+| `missing`       | Incomplete query, needs more info | Text input field                  |
+| `error`         | API or connection error           | Red error bubble                  |
+
+## Deployment
+
+The frontend is deployed on Vercel. Push to `main` triggers automatic deployment. Set `NEXT_PUBLIC_API_BASE` in Vercel's environment variables to point to the deployed backend URL.
