@@ -25,6 +25,62 @@ export default function Home() {
     setMounted(true);
   }, []);
 
+  // ---- Shared response handler ---- //
+  const handleBotResponse = (data: ClarificationResponse | NormalResponse) => {
+    if ("thread_id" in data) {
+      const clarification = data as ClarificationResponse;
+
+      if (clarification.type === "clarification") {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "bot",
+            type: "missing",
+            message: clarification.message,
+            threadId: clarification.thread_id,
+          },
+        ]);
+        return;
+      }
+
+      if (clarification.type === "spelling") {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "bot",
+            type: "clarification",
+            message: clarification.message,
+            threadId: clarification.thread_id,
+            corrections: clarification.corrections,
+          },
+        ]);
+        return;
+      }
+
+      if (clarification.type === "both") {
+        setPendingThreadId(clarification.thread_id);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "bot",
+            type: "clarification",
+            message: clarification.message,
+            threadId: clarification.thread_id,
+            corrections: clarification.corrections,
+          },
+        ]);
+        return;
+      }
+    }
+
+    // Normal response
+    const normal = data as NormalResponse;
+    setMessages((prev) => [
+      ...prev,
+      { role: "bot", type: "normal", data: normal },
+    ]);
+  };
+
   // ---- Send a new query ---- //
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -57,63 +113,7 @@ export default function Home() {
         return;
       }
 
-      // ---- Backend says it needs clarification ---- //
-      if (
-        data.type === "clarification" ||
-        data.type === "both" ||
-        data.type === "spelling"
-      ) {
-        const clarification = data as ClarificationResponse;
-
-        if (clarification.type === "clarification") {
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: "bot",
-              type: "missing",
-              message: clarification.message,
-              threadId: clarification.thread_id,
-            },
-          ]);
-          return;
-        }
-
-        if (clarification.type === "spelling") {
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: "bot",
-              type: "clarification",
-              message: clarification.message,
-              threadId: clarification.thread_id,
-              corrections: clarification.corrections,
-            },
-          ]);
-          return;
-        }
-
-        if (clarification.type === "both") {
-          setPendingThreadId(clarification.thread_id);
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: "bot",
-              type: "clarification",
-              message: clarification.message,
-              threadId: clarification.thread_id,
-              corrections: clarification.corrections,
-            },
-          ]);
-          return;
-        }
-      }
-
-      // Normal parsed response
-      const normal = data as NormalResponse;
-      setMessages((prev) => [
-        ...prev,
-        { role: "bot", type: "normal", data: normal },
-      ]);
+      handleBotResponse(data);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -168,11 +168,7 @@ export default function Home() {
         ]);
         return;
       }
-      const normal = data as NormalResponse;
-      setMessages((prev) => [
-        ...prev,
-        { role: "bot", type: "normal", data: normal },
-      ]);
+      handleBotResponse(data);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -220,11 +216,7 @@ export default function Home() {
         ]);
         return;
       }
-      const normal = data as NormalResponse;
-      setMessages((prev) => [
-        ...prev,
-        { role: "bot", type: "normal", data: normal },
-      ]);
+      handleBotResponse(data);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -395,10 +387,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-          {/* <p className="text-center text-xs text-slate-400 mt-1.5 select-none">
-            Dr. Drug Rag provides educational information only — not medical
-            advice.
-          </p> */}
         </div>
       </div>
     </div>
