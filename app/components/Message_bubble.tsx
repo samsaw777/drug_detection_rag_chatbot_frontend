@@ -16,7 +16,6 @@ export default function MessageBubble({
   onClarificationSubmit,
   onMissingSubmit,
 }: MessageBubbleProps) {
-  // ---- User Message ---- //
   if (message.role === "user") {
     return (
       <div className="flex items-start gap-2.5 justify-end msg-appear">
@@ -36,7 +35,6 @@ export default function MessageBubble({
     );
   }
 
-  // ---- Bot: Error ---- //
   if (message.type === "error") {
     return (
       <div className="flex items-start gap-2.5 msg-appear">
@@ -53,7 +51,6 @@ export default function MessageBubble({
     );
   }
 
-  // ---- Bot: Normal Response ---- //
   if (message.type === "normal") {
     const { data } = message;
     return (
@@ -112,7 +109,6 @@ export default function MessageBubble({
     );
   }
 
-  // ---- Bot: Clarification ---- //
   if (message.type === "clarification") {
     return (
       <div className="flex items-start gap-2.5 msg-appear">
@@ -131,7 +127,6 @@ export default function MessageBubble({
     );
   }
 
-  // ---- Bot: Missing Value ---- //
   if (message.type === "missing") {
     return (
       <div className="flex items-start gap-2.5 msg-appear">
@@ -153,7 +148,6 @@ export default function MessageBubble({
   return null;
 }
 
-// ---- Clarification Sub-component ---- //
 type ClarificationBubbleProps = {
   message: string;
   threadId: string;
@@ -220,7 +214,6 @@ function ClarificationBubble({
   );
 }
 
-// ---- Missing Value Sub-component ---- //
 type MissingBubbleProps = {
   message: string;
   threadId: string;

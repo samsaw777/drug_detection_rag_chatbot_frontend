@@ -27,12 +27,10 @@ export default function MessageList({
   const bottomRef = useRef<HTMLDivElement>(null);
   const [activeSuggestion, setActiveSuggestion] = useState(0);
 
-  // Auto-scroll on new messages or loading change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // Cycle suggestions when empty
   useEffect(() => {
     if (messages.length > 0) return;
     const interval = setInterval(() => {
@@ -44,9 +42,7 @@ export default function MessageList({
   return (
     <div className="flex-1 overflow-y-auto chat-scroll">
       {messages.length === 0 ? (
-        /* ---- Empty State ---- */
         <div className="h-full flex flex-col items-center justify-center px-6 pb-8">
-          {/* Medical illustration */}
           <div className="relative mb-6">
             <div
               className="w-24 h-24 rounded-3xl flex items-center justify-center"
@@ -138,18 +134,15 @@ export default function MessageList({
             />
           </div>
 
-          {/* Heading */}
           <h2 className="text-xl font-bold text-slate-800 mb-1.5 tracking-tight">
             Pharmacological Interaction Assistant
           </h2>
 
-          {/* Subtitle */}
           <p className="text-sm text-slate-500 text-center max-w-md mb-8">
             Ask about drug-food, drug-herb, and drug-drug interactions. Get
             severity levels, mechanisms, and recommendations instantly.
           </p>
 
-          {/* Single cycling suggestion */}
           <div className="w-full max-w-md">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3 text-center">
               Try asking
@@ -188,7 +181,6 @@ export default function MessageList({
           </div>
         </div>
       ) : (
-        /* ---- Messages ---- */
         <div className="max-w-3xl mx-auto py-5 flex flex-col gap-4 px-5">
           {messages.map((msg, i) => (
             <MessageBubble
@@ -206,7 +198,6 @@ export default function MessageList({
   );
 }
 
-// ---- Thinking Pill Loader ---- //
 const THINKING_STEPS = [
   "Analysing query...",
   "Checking cache...",
@@ -251,7 +242,6 @@ function LoadingBubble() {
               animation: "thinking-spin 0.7s linear infinite",
             }}
           />
-          {/* Step text — fades in/out */}
           <span
             className="text-sm text-slate-500 transition-opacity duration-200"
             style={{
@@ -267,7 +257,6 @@ function LoadingBubble() {
   );
 }
 
-// ---- Shared Avatar Components ---- //
 export function UserAvatar() {
   return (
     <div className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center shrink-0 shadow-sm">

@@ -1,5 +1,3 @@
-// ---- Response Types (from backend) ---- //
-
 export type NormalResponse = {
   interaction_types: string[];
   drugs: string[];
@@ -21,8 +19,6 @@ export type ClarificationResponse = {
   thread_id: string;
   type: "clarification" | "spelling" | "both";
 };
-
-// ---- Chat Message Types ---- //
 
 export type UserMessage = {
   role: "user";

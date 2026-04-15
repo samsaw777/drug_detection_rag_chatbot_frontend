@@ -25,7 +25,6 @@ export default function Home() {
     setMounted(true);
   }, []);
 
-  // ---- Shared response handler ---- //
   const handleBotResponse = (data: ClarificationResponse | NormalResponse) => {
     if ("thread_id" in data) {
       const clarification = data as ClarificationResponse;
@@ -73,7 +72,6 @@ export default function Home() {
       }
     }
 
-    // Normal response
     const normal = data as NormalResponse;
     setMessages((prev) => [
       ...prev,
@@ -81,7 +79,6 @@ export default function Home() {
     ]);
   };
 
-  // ---- Send a new query ---- //
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -107,7 +104,7 @@ export default function Home() {
           {
             role: "bot",
             type: "error",
-            content: `❌ Error: ${data.detail || "Something went wrong."}`,
+            content: `Error: ${data.detail || "Something went wrong."}`,
           },
         ]);
         return;
@@ -120,7 +117,7 @@ export default function Home() {
         {
           role: "bot",
           type: "error",
-          content: "❌ Error connecting to server. Is the backend running?",
+          content: "Error connecting to server. Is the backend running?",
         },
       ]);
     } finally {
@@ -128,7 +125,6 @@ export default function Home() {
     }
   };
 
-  // ---- Handle clarification response ---- //
   const handleClarificationSubmit = async (
     threadId: string,
     userInput: string,
@@ -163,7 +159,7 @@ export default function Home() {
           {
             role: "bot",
             type: "error",
-            content: `❌ Error: ${data.detail || "Something went wrong."}`,
+            content: `Error: ${data.detail || "Something went wrong."}`,
           },
         ]);
         return;
@@ -175,7 +171,7 @@ export default function Home() {
         {
           role: "bot",
           type: "error",
-          content: "❌ Error connecting to server. Is the backend running?",
+          content: "Error connecting to server. Is the backend running?",
         },
       ]);
     } finally {
@@ -183,7 +179,6 @@ export default function Home() {
     }
   };
 
-  // ---- Handle missing value ---- //
   const handleMissingSubmit = async (threadId: string, userInput: string) => {
     setMessages((prev) => [...prev, { role: "user", content: userInput }]);
     setLoading(true);
@@ -211,7 +206,7 @@ export default function Home() {
           {
             role: "bot",
             type: "error",
-            content: `❌ Error: ${data.detail || "Something went wrong."}`,
+            content: `Error: ${data.detail || "Something went wrong."}`,
           },
         ]);
         return;
@@ -223,7 +218,7 @@ export default function Home() {
         {
           role: "bot",
           type: "error",
-          content: "❌ Error connecting to server. Is the backend running?",
+          content: "Error connecting to server. Is the backend running?",
         },
       ]);
     } finally {

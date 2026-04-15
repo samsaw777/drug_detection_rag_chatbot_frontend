@@ -1,8 +1,5 @@
 import Link from "next/link";
 
-// IMPORTANT: Your layout.tsx must wrap children in a flex column with h-screen:
-// <body><div className="flex flex-col h-screen overflow-hidden">{navbar}{children}</div></body>
-
 export default function Navbar() {
   return (
     <header
@@ -44,26 +41,6 @@ export default function Navbar() {
           </p>
         </div>
       </Link>
-
-      {/* Right — Status + Nav */}
-      {/* <div className="flex items-center gap-6">
-        <Link
-          href="/"
-          className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
-        >
-          Home
-        </Link>
-        <Link
-          href="/about"
-          className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
-        >
-          About Us
-        </Link>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
-          <span className="text-emerald-400 text-xs font-medium">Online</span>
-        </div>
-      </div> */}
     </header>
   );
 }
